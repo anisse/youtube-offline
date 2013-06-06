@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source config.sh
+
+mkdir -p "$DEST_DIR"
+cd "$DEST_DIR"
+youtube-dl -c https://www.youtube.com/playlist?list=$PLAYLIST_ID
+# TODO: delete files not on playlist
+
+
+#now sync with target
+lftp -u $FTP_LOGIN,$FTP_PASSWORD $FTP_HOST <<EOF
+set ftp:passive-mode on
+mirror --reverse --continue --delete --verbose "$DEST_DIR" "$FTP_REMOTE_DIR"
+quit 0
+EOF
+
