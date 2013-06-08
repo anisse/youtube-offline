@@ -4,8 +4,9 @@ source config.sh
 
 mkdir -p "$DEST_DIR"
 cd "$DEST_DIR"
-youtube-dl -c https://www.youtube.com/playlist?list=$PLAYLIST_ID
-# TODO: delete files not on playlist
+youtube-dl --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
+# TODO: delete files not on playlist with
+FILELIST=$(youtube-dl --get-filename)
 
 
 #now sync with target
