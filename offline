@@ -5,8 +5,12 @@ source config.sh
 mkdir -p "$DEST_DIR"
 cd "$DEST_DIR"
 youtube-dl --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
-# TODO: delete files not on playlist with
-FILELIST=$(youtube-dl --get-filename)
+
+# Remove files that have been deleted from the playlist
+# the comm commands does a diff between the output of ls and youtube-dl, keeping
+# only the lines that are unique.
+# We pipe it all to rm to remove those
+comm -3 <(ls -x) <(youtube-dl --get-filename https://www.youtube.com/playlist?list=$PLAYLIST_ID | sort) | xargs --delimiter='\n' rm --verbose --force
 
 
 #now sync with target
