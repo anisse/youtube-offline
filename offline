@@ -2,21 +2,34 @@
 
 source config.sh
 
-mkdir -p "$DEST_DIR"
-cd "$DEST_DIR"
-youtube-dl --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
+offline() {
+	mkdir -p "$DEST_DIR"
+	cd "$DEST_DIR"
+	youtube-dl --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
 
-# Remove files that have been deleted from the playlist
-# the comm commands does a diff between the output of ls and youtube-dl, keeping
-# only the lines that are unique.
-# We pipe it all to rm to remove those
-comm -3 <(ls -x) <(youtube-dl --get-filename https://www.youtube.com/playlist?list=$PLAYLIST_ID | sort) | xargs --delimiter='\n' rm --verbose --force
+	# Remove files that have been deleted from the playlist
+	# the comm commands does a diff between the output of ls and youtube-dl, keeping
+	# only the lines that are unique.
+	# We pipe it all to rm to remove those
+	comm -3 <(ls -x) <(youtube-dl --get-filename https://www.youtube.com/playlist?list=$PLAYLIST_ID | sort) | xargs --delimiter='\n' rm --verbose --force
 
 
-#now sync with target
-lftp -u $FTP_LOGIN,$FTP_PASSWORD $FTP_HOST <<EOF
-set ftp:passive-mode on
-mirror --reverse --continue --delete --verbose "$DEST_DIR" "$FTP_REMOTE_DIR"
-quit 0
+	#now sync with target
+	lftp -u $FTP_LOGIN,$FTP_PASSWORD $FTP_HOST <<EOF
+	set ftp:passive-mode on
+	mirror --reverse --continue --delete --verbose "$DEST_DIR" "$FTP_REMOTE_DIR"
+	quit 0
 EOF
 
+}
+
+if [ ! -d ytdl ]; then
+	virtualenv ytdl
+fi
+source ytdl/bin/activate
+pip install -U youtube-dl
+
+while true; do
+	offline
+	sleep 2h
+done
