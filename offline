@@ -5,7 +5,7 @@ source config.sh
 offline() {
 	mkdir -p "$DEST_DIR"
 	cd "$DEST_DIR"
-	youtube-dl --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
+	youtube-dl --ignore-errors --continue https://www.youtube.com/playlist?list=$PLAYLIST_ID
 
 	# Remove files that have been deleted from the playlist
 	# the comm commands does a diff between the output of ls and youtube-dl, keeping
